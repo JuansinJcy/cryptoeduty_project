@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#020814" />
+    <meta name="description" content="Crypto E-Duty: plataforma educativa open source sobre cripto, billetera ficticia y guía profesional para usuarios nuevos. Aprende sobre criptomonedas de forma segura y gratuita." />
+    
+    <!-- Open Graph / Social Media Meta Tags -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Crypto E-Duty - Educación Cripto Open Source" />
+    <meta property="og:description" content="Plataforma educativa open source sobre criptomonedas con billetera ficticia para aprendizaje seguro." />
+    <meta property="og:image" content="https://TU_USUARIO.github.io/crypto-e-duty/og-image.png" />
+    <meta property="og:url" content="https://TU_USUARIO.github.io/crypto-e-duty/" />
+    <meta property="og:site_name" content="Crypto E-Duty" />
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Crypto E-Duty - Educación Cripto Open Source" />
+    <meta name="twitter:description" content="Plataforma educativa open source sobre criptomonedas con billetera ficticia para aprendizaje seguro." />
+    <meta name="twitter:image" content="https://TU_USUARIO.github.io/crypto-e-duty/og-image.png" />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="alternate icon" href="/favicon.ico" type="image/x-icon" />
+    
+    <!-- Apple Touch Icon -->
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    
+    <!-- Manifest para PWA -->
+    <link rel="manifest" href="/manifest.json" />
+    
+    <!-- Fuente Inter de Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    
+    <title>Crypto E-Duty | Educación Cripto Open Source</title>
+    
+    <!-- Script para detectar GitHub Pages -->
+    <script>
+      (function () {
+        const isGitHubPages = location.hostname.includes("github.io");
+        document.documentElement.classList.add(isGitHubPages ? "gh-pages" : "local");
+        
+        // Guardar preferencia de tema
+        const savedTheme = localStorage.getItem('theme') || 
+          (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+        document.documentElement.setAttribute('data-theme', savedTheme);
+      })();
+    </script>
+    
+    <!-- Preload de estilos y scripts -->
+    <link rel="modulepreload" href="/src/main.jsx" />
+    <link rel="preload" href="/src/styles.css" as="style" />
+  </head>
+  
+  <body>
+    <noscript>
+      <div style="text-align: center; padding: 50px; font-family: Arial, sans-serif; color: #333;">
+        <h1>Crypto E-Duty</h1>
+        <p>Esta aplicación requiere JavaScript para funcionar correctamente.</p>
+        <p>Por favor, habilita JavaScript en tu navegador.</p>
+      </div>
+    </noscript>
+    
+    <div id="root"></div>
+    
+    <!-- Carga el script principal -->
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+
+/* ============================================
+   NOTAS PARA IMPLEMENTACIÓN:
+   ============================================
+   
+   1. Crea estos archivos en la raíz de tu proyecto:
+      - favicon.svg / favicon.ico
+      - apple-touch-icon.png (180x180)
+      - og-image.png (1200x630 para Open Graph)
+      - manifest.json (para PWA)
+   
+   2. Ejemplo de manifest.json:
+   {
+     "name": "Crypto E-Duty",
+     "short_name": "CryptoEDuty",
+     "description": "Plataforma educativa sobre criptomonedas",
+     "start_url": ".",
+     "display": "standalone",
+     "background_color": "#020814",
+     "theme_color": "#020814",
+     "icons": [
+       {
+         "src": "/android-chrome-192x192.png",
+         "sizes": "192x192",
+         "type": "image/png"
+       },
+       {
+         "src": "/android-chrome-512x512.png",
+         "sizes": "512x512",
+         "type": "image/png"
+       }
+     ]
+   }
+   
+   3. Para el favicon SVG, puedes usar:
+   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+     <rect width="100" height="100" rx="20" fill="#020814"/>
+     <text x="50" y="65" font-size="50" text-anchor="middle" fill="#2d7cff" font-family="Arial, sans-serif">CE</text>
+   </svg>
+*/

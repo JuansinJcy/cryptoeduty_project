@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#020814" />
+    <meta
+      name="description"
+      content="Crypto E-Duty: plataforma educativa open source sobre cripto, billetera ficticia y guía profesional para usuarios nuevos."
+    />
+    <title>Crypto E-Duty</title>
+    <script>
+      (function () {
+        const isGitHubPages = location.hostname.includes("github.io");
+        document.documentElement.classList.add(isGitHubPages ? "gh-pages" : "local");
+      })();
+    </script>
+  </head>
+  <body>
+    <noscript>Esta aplicación requiere JavaScript para funcionar.</noscript>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

@@ -1,0 +1,854 @@
+     1→import React, { useState, useMemo, createContext, useContext } from 'react'
+     2→import { menuItems, cryptoTips, cryptoNews2026, creatorBio, learningModules, faqItems, techStack } from './data/content'
+     3→import { createDemoWallet, mockTransfer } from './wallet/srcwalletwalletDemo'
+     4→
+     5→// ==================== CONTEXTO DE TEMA (Día/Noche) ====================
+     6→const ThemeContext = createContext()
+     7→
+     8→export function ThemeProvider({ children }) {
+     9→  const [theme, setTheme] = useState('dark')
+    10→  
+    11→  const toggleTheme = () => {
+    12→    setTheme(prev => prev === 'dark' ? 'light' : 'dark')
+    13→  }
+    14→  
+    15→  return (
+    16→    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    17→      {children}
+    18→    </ThemeContext.Provider>
+    19→  )
+    20→}
+    21→
+    22→export function useTheme() {
+    23→  return useContext(ThemeContext)
+    24→}
+    25→
+    26→// ==================== COMPONENTES REUTILIZABLES ====================
+    27→
+    28→// Barra de Progreso Interactiva
+    29→function ProgressBar({ progress, total }) {
+    30→  const percentage = (progress / total) * 100
+    31→  
+    32→  return (
+    33→    <div className="progress-container">
+    34→      <div className="progress-bar">
+    35→        <div 
+    36→          className="progress-fill" 
+    37→          style={{ width: `${percentage}%` }}
+    38→        />
+    39→      </div>
+    40→      <span className="progress-text">{Math.round(percentage)}% completado</span>
+    41→    </div>
+    42→  )
+    43→}
+    44→
+    45→// Tarjeta de Módulo de Aprendizaje
+    46→function LearningModuleCard({ module, completed, onComplete }) {
+    47→  const [isExpanded, setIsExpanded] = useState(false)
+    48→  
+    49→  return (
+    50→    <div className={`module-card ${completed ? 'completed' : ''}`}>
+    51→      <div className="module-header">
+    52→        <div className="module-icon">
+    53→          {module.icon}
+    54→        </div>
+    55→        <div className="module-info">
+    56→          <h3>{module.title}</h3>
+    57→          <span className="module-level">{module.level}</span>
+    58→        </div>
+    59→        <span className="module-status">
+    60→          {completed ? '✓ Completado' : `${module.duration}`}
+    61→        </span>
+    62→      </div>
+    63→      
+    64→      <div className={`module-content ${isExpanded ? 'expanded' : ''}`}>
+    65→        <p>{module.description}</p>
+    66→        {module.topics && (
+    67→          <ul className="module-topics">
+    68→            {module.topics.map((topic, i) => (
+    69→              <li key={i}>{topic}</li>
+    70→            ))}
+    71→          </ul>
+    72→        )}
+    73→        {!completed && (
+    74→          <button 
+    75→            className="complete-btn" 
+    76→            onClick={() => onComplete(module.id)}
+    77→          >
+    78→            Marcar como completado
+    79→          </button>
+    80→        )}
+    81→      </div>
+    82→      
+    83→      <button 
+    84→        className="expand-btn" 
+    85→        onClick={() => setIsExpanded(!isExpanded)}
+    86→      >
+    87→        {isExpanded ? '▲' : '▼'}
+    88→      </button>
+    89→    </div>
+    90→  )
+    91→}
+    92→
+    93→// Tips Tutoriales para Nuevos Usuarios
+    94→function TutorialTips() {
+    95→  const [currentTip, setCurrentTip] = useState(0)
+    96→  const [showTips, setShowTips] = useState(true)
+    97→  
+    98→  const tips = [
+    99→    {
+   100→      title: "Bienvenido a Crypto E-Duty",
+   101→      content: "Esta plataforma te ayudará a aprender sobre criptomonedas de forma segura usando fondos ficticios."
+   102→    },
+   103→    {
+   104→      title: "¿Por qué aprender sobre cripto?",
+   105→      content: "En el siglo 21, entender los activos digitales y la tecnología blockchain es una habilidad esencial para navegar el mundo financiero."
+   106→    },
+   107→    {
+   108→      title: "¿Cómo usar la wallet educativa?",
+   109→      content: "Crea una wallet, revisa tu saldo ficticio y simula transferencias para aprender sin riesgo."
+   110→    },
+   111→    {
+   112→      title: "Explora la ruta de aprendizaje",
+   113→      content: "Completa los módulos para obtener una comprensión completa de los conceptos básicos."
+   114→    }
+   115→  ]
+   116→  
+   117→  if (!showTips) return null
+   118→  
+   119→  return (
+   120→    <div className="tutorial-overlay">
+   121→      <div className="tutorial-card">
+   122→        <button 
+   123→          className="close-tips" 
+   124→          onClick={() => setShowTips(false)}
+   125→        >
+   126→          ×
+   127→        </button>
+   128→        <h3>{tips[currentTip].title}</h3>
+   129→        <p>{tips[currentTip].content}</p>
+   130→        <div className="tutorial-nav">
+   131→          <button 
+   132→            onClick={() => setCurrentTip((currentTip - 1 + tips.length) % tips.length)}
+   133→            disabled={tips.length <= 1}
+   134→          >
+   135→            Anterior
+   136→          </button>
+   137→          <span>{currentTip + 1} / {tips.length}</span>
+   138→          <button 
+   139→            onClick={() => setCurrentTip((currentTip + 1) % tips.length)}
+   140→            disabled={tips.length <= 1}
+   141→          >
+   142→            Siguiente
+   143→          </button>
+   144→        </div>
+   145→      </div>
+   146→    </div>
+   147→  )
+   148→}
+   149→
+   150→// Botones de Soporte y API
+   151→function SupportSection() {
+   152→  return (
+   153→    <div className="support-section">
+   154→      <h3>Recursos de Desarrollo</h3>
+   155→      <div className="support-buttons">
+   156→        {techStack.map((tech, i) => (
+   157→          <div key={i} className="tech-badge">
+   158→            {tech.icon} {tech.name}
+   159→          </div>
+   160→        ))}
+   161→      </div>
+   162→      <div className="support-links">
+   163→        <a href="https://github.com/JuansinJcy/cryptoeduty_project" target="_blank" rel="noopener">
+   164→          📂 Ver en GitHub
+   165→        </a>
+   166→        <a href="#" className="api-link">
+   167→          🔗 API Documentation
+   168→        </a>
+   169→        <a href="#" className="support-link">
+   170→          ❓ Soporte Técnico
+   171→        </a>
+   172→      </div>
+   173→    </div>
+   174→  )
+   175→}
+   176→
+   177→// ==================== COMPONENTE PRINCIPAL ====================
+   178→function App() {
+   179→  const [activeSection, setActiveSection] = useState('home')
+   180→  const [wallet, setWallet] = useState(null)
+   181→  const [to, setTo] = useState('')
+   182→  const [amount, setAmount] = useState('')
+   183→  const [status, setStatus] = useState('')
+   184→  const [email, setEmail] = useState('')
+   185→  const [completedModules, setCompletedModules] = useState([])
+   186→  const [showTutorial, setShowTutorial] = useState(true)
+   187→  
+   188→  const { theme, toggleTheme } = useTheme()
+   189→  
+   190→  // Calcula progreso de aprendizaje
+   191→  const totalModules = learningModules.length
+   192→  const completedCount = completedModules.length
+   193→  const progress = (completedCount / totalModules) * 100
+   194→  
+   195→  const breadcrumbs = useMemo(() => {
+   196→    const map = {
+   197→      home: 'Inicio',
+   198→      project: 'Detalles del proyecto',
+   199→      purpose: 'Propósito',
+   200→      learning: 'Ruta de Aprendizaje',
+   201→      wallet: 'Wallet Educativa',
+   202→      manual: 'Manual de usuario',
+   203→      bio: 'Biografía',
+   204→      why: '¿Por qué este proyecto?',
+   205→      tech: 'Tecnología'
+   206→    }
+   207→    return ['Inicio', map[activeSection]]
+   208→  }, [activeSection])
+   209→  
+   210→  const handleCreateWallet = () => {
+   211→    setWallet(createDemoWallet())
+   212→    setStatus('✓ Wallet educativa creada correctamente.')
+   213→  }
+   214→  
+   215→  const handleTransfer = () => {
+   216→    if (!to || !amount) {
+   217→      setStatus('⚠️ Completa destino y monto para simular la operación.')
+   218→      return
+   219→    }
+   220→    const result = mockTransfer(amount, to)
+   221→    setStatus(result.message)
+   222→    setTo('')
+   223→    setAmount('')
+   224→  }
+   225→  
+   226→  const handleNewsletter = (e) => {
+   227→    e.preventDefault()
+   228→    if (!email) {
+   229→      setStatus('⚠️ Ingresa un correo válido para continuar.')
+   230→      return
+   231→    }
+   232→    setStatus('✓ Correo registrado para novedades.')
+   233→    setEmail('')
+   234→  }
+   235→  
+   236→  const handleCompleteModule = (moduleId) => {
+   237→    if (!completedModules.includes(moduleId)) {
+   238→      setCompletedModules([...completedModules, moduleId])
+   239→      setStatus(`✓ Módulo completado: ${learningModules.find(m => m.id === moduleId)?.title}`)
+   240→    }
+   241→  }
+   242→  
+   243→  const handleResetProgress = () => {
+   244→    setCompletedModules([])
+   245→    setStatus('Progreso reiniciado.')
+   246→  }
+   247→  
+   248→  const downloadGuide = () => {
+   249→    // Simulación de descarga
+   250→    setStatus('✓ Descargando guía de aprendizaje...')
+   251→    // En un entorno real, esto sería un enlace a un archivo PDF
+   252→    window.open('/manual/guia-rapida.pdf', '_blank')
+   253→  }
+   254→  
+   255→  // Filtra módulos por estado
+   256→  const availableModules = learningModules.filter(
+   257→    module => !completedModules.includes(module.id)
+   258→  )
+   259→  const nextModule = availableModules[0]
+   260→  
+   261→  return (
+   262→    <div className={`layout ${theme}`}>
+   263→      {/* Tutorial para nuevos usuarios */}
+   264→      {showTutorial && <TutorialTips />}
+   265→      
+   266→      {/* Sidebar */}
+   267→      <aside className="sidebar">
+   268→        <div className="brand">
+   269→          <span className="brand-mark">CE</span>
+   270→          <div>
+   271→            <h2>Crypto E-Duty</h2>
+   272→            <p>Open Source • Educación • Interfaz Profesional</p>
+   273→          </div>
+   274→        </div>
+   275→
+   276→        <nav className="side-nav">
+   277→          {menuItems.map(item => (
+   278→            <button
+   279→              key={item.id}
+   280→              className={activeSection === item.id ? 'nav-btn active' : 'nav-btn'}
+   281→              onClick={() => setActiveSection(item.id)}
+   282→            >
+   283→              {item.label}
+   284→            </button>
+   285→          ))}
+   286→          
+   287→          {/* Nuevas secciones */}
+   288→          <button
+   289→            className={activeSection === 'why' ? 'nav-btn active' : 'nav-btn'}
+   290→            onClick={() => setActiveSection('why')}
+   291→          >
+   292→            ¿Por qué este proyecto?
+   293→          </button>
+   294→          <button
+   295→            className={activeSection === 'learning' ? 'nav-btn active' : 'nav-btn'}
+   296→            onClick={() => setActiveSection('learning')}
+   297→          >
+   298→            Ruta de Aprendizaje
+   299→          </button>
+   300→          <button
+   301→            className={activeSection === 'tech' ? 'nav-btn active' : 'nav-btn'}
+   302→            onClick={() => setActiveSection('tech')}
+   303→          >
+   304→            Tecnología Usada
+   305→          </button>
+   306→        </nav>
+   307→
+   308→        {/* Barra de progreso en sidebar */}
+   309→        <div className="sidebar-progress">
+   310→          <h4>Progreso de Aprendizaje</h4>
+   311→          <ProgressBar progress={completedCount} total={totalModules} />
+   312→          {completedCount > 0 && (
+   313→            <button className="reset-progress" onClick={handleResetProgress}>
+   314→              Reiniciar
+   315→            </button>
+   316→          )}
+   317→        </div>
+   318→
+   319→        <div className="sidebar-card">
+   320→          <p>💡 Tips Rápidos:</p>
+   321→          <ul>
+   322→            {cryptoTips.slice(0, 3).map((tip, i) => (
+   323→              <li key={i}>{tip}</li>
+   324→            ))}
+   325→          </ul>
+   326→        </div>
+   327→
+   328→        {/* Toggle de tema */}
+   329→        <div className="theme-toggle-container">
+   330→          <button className="theme-toggle" onClick={toggleTheme}>
+   331→            {theme === 'dark' ? '☀️ Modo Día' : '🌙 Modo Noche'}
+   332→          </button>
+   333→        </div>
+   334→      </aside>
+   335→
+   336→      {/* Contenido Principal */}
+   337→      <main className="content">
+   338→        {/* Topbar */}
+   339→        <header className="topbar">
+   340→          <div className="breadcrumbs">
+   341→            {breadcrumbs.map((item, index) => (
+   342→              <span key={item}>
+   343→                {index > 0 && <span className="crumb-sep">/</span>}
+   344→                {item}
+   345→              </span>
+   346→            ))}
+   347→          </div>
+   348→          <div className="topbar-actions">
+   349→            <a href="#wallet" className="ghost-link">Ir a Wallet</a>
+   350→            <button className="ghost-link" onClick={downloadGuide}>
+   351→              📥 Descargar Guía PDF
+   352→            </button>
+   353→          </div>
+   354→        </header>
+   355→
+   356→        {/* Sección Hero */}
+   357→        <section className="hero" id="home">
+   358→          <div className="hero-copy">
+   359→            <p className="eyebrow">Plataforma Educativa Open Source</p>
+   360→            <h1>Educación cripto clara, moderna y accesible</h1>
+   361→            <p>
+   362→              Crypto E-Duty es una plataforma de aprendizaje interactiva que combina 
+   363→              una billetera educativa con contenido profesional, diseñada para quienes 
+   364→              quieren entender el mundo cripto desde cero, sin riesgos.
+   365→            </p>
+   366→            <div className="hero-actions">
+   367→              <button className="primary-btn" onClick={handleCreateWallet}>
+   368→                Crear wallet educativa
+   369→              </button>
+   370→              <button 
+   371→                className="secondary-btn" 
+   372→                onClick={() => setActiveSection('learning')}
+   373→              >
+   374→                Comenzar Ruta de Aprendizaje
+   375→              </button>
+   376→            </div>
+   377→          </div>
+   378→
+   379→          <div className="hero-panel">
+   380→            <div className="glow-card">
+   381→              <span>Estado de la demo</span>
+   382→              <strong>{wallet ? '✓ Activa' : 'Lista para iniciar'}</strong>
+   383→              <small>{wallet ? wallet.network : 'Presiona crear wallet'}</small>
+   384→              {wallet && (
+   385→                <div className="wallet-preview">
+   386→                  <span>Saldo: {wallet.balance} EDU</span>
+   387→                </div>
+   388→              )}
+   389→            </div>
+   390→            
+   391→            {/* Siguiente módulo sugerido */}
+   392→            {nextModule && (
+   393→              <div className="next-module-card">
+   394→                <span>Próximo módulo:</span>
+   395→                <strong>{nextModule.title}</strong>
+   396→                <small>{nextModule.level}</small>
+   397→              </div>
+   398→            )}
+   399→          </div>
+   400→        </section>
+   401→
+   402→        {/* Sección: ¿Por qué este proyecto? */}
+   403→        {activeSection === 'why' && (
+   404→          <section className="glass-card" id="why">
+   405→            <h2>¿Por qué este proyecto?</h2>
+   406→            
+   407→            <div className="why-grid">
+   408→              <article>
+   409→                <h3>🎯 Importancia de Aprender sobre Criptomonedas</h3>
+   410→                <p>
+   411→                  En el siglo 21, las criptomonedas y la tecnología blockchain 
+   412→                  están transformando la forma en que interactuamos con el dinero 
+   413→                  y los activos digitales. Comprender estos conceptos no es opcional: 
+   414→                  es una necesidad para navegar con seguridad en el mundo financiero 
+   415→                  digital.
+   416→                </p>
+   417→                <p>
+   418→                  <strong>Beneficios:</strong>
+   419→                </p>
+   420→                <ul>
+   421→                  <li>🔒 Entender la custodia de tus activos</li>
+   422→                  <li>🛡️ Reconocer y evitar estafas comunes</li>
+   423→                  <li>📊 Tomar decisiones financieras informadas</li>
+   424→                  <li>🌍 Participar en la economía digital global</li>
+   425→                </ul>
+   426→              </article>
+   427→
+   428→              <article>
+   429→                <h3>🏫 Utilidad para Entornos Educativos</h3>
+   430→                <p>
+   431→                  Crypto E-Duty está diseñado específicamente para entornos 
+   432→                  educativos, ofreciendo:
+   433→                </p>
+   434→                <ul>
+   435→                  <li><strong>Aprendizaje práctico:</strong> Usa fondos ficticios para simular operaciones reales</li>
+   436→                  <li><strong>Seguridad total:</strong> Sin riesgo de perder dinero real</li>
+   437→                  <li><strong>Enfoque progresivo:</strong> De conceptos básicos a avanzados</li>
+   438→                  <li><strong>Accesibilidad:</strong> Diseñado para todas las edades y niveles de experiencia</li>
+   439→                </ul>
+   440→              </article>
+   441→
+   442→              <article>
+   443→                <h3>🔓 ¿Por qué Open Source?</h3>
+   444→                <p>
+   445→                  Ser open source significa que:
+   446→                </p>
+   447→                <ul>
+   448→                  <li><strong>Transparencia:</strong> Cualquiera puede auditar el código</li>
+   449→                  <li><strong>Colaboración:</strong> La comunidad puede contribuir y mejorar</li>
+   450→                  <li><strong>Accesibilidad:</strong> Gratis para todos, sin barreras</li>
+   451→                  <li><strong>Educación:</strong> Los estudiantes pueden aprender del código</li>
+   452→                  <li><strong>Confianza:</strong> No hay código oculto o malicioso</li>
+   453→                </ul>
+   454→                <p>
+   455→                  Este proyecto sigue la filosofía de que el conocimiento 
+   456→                  debe ser libre y accesible para todos.
+   457→                </p>
+   458→              </article>
+   459→
+   460→              <article>
+   461→                <h3>💡 Oportunidades de Aprendizaje</h3>
+   462→                <p>
+   463→                  Al completar la ruta de aprendizaje, podrás:
+   464→                </p>
+   465→                <ul>
+   466→                  <li>Entender qué es una wallet y cómo funciona</li>
+   467→                  <li>Realizar transferencias de forma segura</li>
+   468→                  <li>Identificar proyectos serios de estafas</li>
+   469→                  <li>Comprender los conceptos básicos de blockchain</li>
+   470→                  <li>Explorar el mundo DeFi con confianza</li>
+   471→                  <li>Participar en la economía cripto de manera informada</li>
+   472→                </ul>
+   473→              </article>
+   474→
+   475→              <article>
+   476→                <h3>🌐 ¿Por qué una Aplicación Web?</h3>
+   477→                <p>
+   478→                  Elegimos desarrollar una aplicación web porque:
+   479→                </p>
+   480→                <ul>
+   481→                  <li><strong>Accesibilidad:</strong> Funciona en cualquier dispositivo con navegador</li>
+   482→                  <li><strong>Sin instalación:</strong> No requiere descargar nada</li>
+   483→                  <li><strong>Actualizaciones automáticas:</strong> Siempre tienes la última versión</li>
+   484→                  <li><strong>Compartible:</strong> Fácil de compartir con otros</li>
+   485→                  <li><strong>Económico:</strong> Sin costos de desarrollo para múltiples plataformas</li>
+   486→                </ul>
+   487→                <p>
+   488→                  <strong>¿Por qué React?</strong> Porque ofrece:
+   489→                </p>
+   490→                <ul>
+   491→                  <li>Componentes reutilizables</li>
+   492→                  <li>Interfaz interactiva y dinámica</li>
+   493→                  <li>Comunidad grande y documentación extensa</li>
+   494→                  <li>Rendimiento excelente</li>
+   495→                  <li>Fácil de mantener y escalar</li>
+   496→                </ul>
+   497→              </article>
+   498→            </div>
+   499→          </section>
+   500→        )}
+   501→
+   502→        {/* Sección: Ruta de Aprendizaje */}
+   503→        {activeSection === 'learning' && (
+   504→          <section className="glass-card" id="learning">
+   505→            <h2>📚 Ruta de Aprendizaje</h2>
+   506→            <p>
+   507→              Completa estos módulos para obtener una comprensión completa 
+   508→              de los conceptos básicos de criptomonedas y blockchain.
+   509→            </p>
+   510→            
+   511→            {/* Barra de progreso general */}
+   512→            <div className="learning-progress">
+   513→              <ProgressBar progress={completedCount} total={totalModules} />
+   514→              <span>
+   515→                {completedCount} de {totalModules} módulos completados
+   516→              </span>
+   517→            </div>
+   518→
+   519→            {/* Módulos de aprendizaje */}
+   520→            <div className="modules-grid">
+   521→              {learningModules.map(module => (
+   522→                <LearningModuleCard
+   523→                  key={module.id}
+   524→                  module={module}
+   525→                  completed={completedModules.includes(module.id)}
+   526→                  onComplete={handleCompleteModule}
+   527→                />
+   528→              ))}
+   529→            </div>
+   530→
+   531→            {/* Certificado de finalización */}
+   532→            {completedCount === totalModules && (
+   533→              <div className="completion-card">
+   534→                <h3>🎉 ¡Felicidades!</h3>
+   535→                <p>Has completado todos los módulos de aprendizaje.</p>
+   536→                <p>Ahora tienes una base sólida en conceptos de criptomonedas.</p>
+   537→                <button className="primary-btn" onClick={downloadGuide}>
+   538→                  📜 Obtener Certificado de Finalización
+   539→                </button>
+   540→              </div>
+   541→            )}
+   542→          </section>
+   543→        )}
+   544→
+   545→        {/* Sección: Detalles del Proyecto */}
+   546→        {activeSection === 'project' && (
+   547→          <section className="section-grid" id="project">
+   548→            <article className="glass-card">
+   549→              <h2>Detalles del proyecto</h2>
+   550→              <p>
+   551→                Crypto E-Duty es una plataforma open source diseñada para 
+   552→                democratizar el acceso a la educación sobre criptomonedas. 
+   553→                Combina una interfaz profesional con contenido educativo 
+   554→                de calidad, todo en un entorno seguro y sin riesgos.
+   555→              </p>
+   556→              <p>
+   557→                <strong>Objetivos principales:</strong>
+   558→              </p>
+   559→              <ul>
+   560→                <li>Ofrecer una experiencia de aprendizaje interactiva</li>
+   561→                <li>Proporcionar una wallet educativa con fondos ficticios</li>
+   562→                <li>Explicar conceptos complejos de forma sencilla</li>
+   563→                <li>Ser accesible para personas de todas las edades</li>
+   564→                <li>Mantener un diseño profesional y moderno</li>
+   565→              </ul>
+   566→            </article>
+   567→
+   568→            <article className="glass-card" id="purpose">
+   569→              <h2>Propósito</h2>
+   570→              <p>
+   571→                Democratizar la comprensión básica del ecosistema cripto, 
+   572→                evitando la complejidad innecesaria. La educación en cripto 
+   573→                es importante porque el siglo 21 exige usuarios capaces de 
+   574→                reconocer riesgos, entender custodia de activos y navegar 
+   575→                tecnologías digitales con criterio.
+   576→              </p>
+   577→              <p>
+   578→                <strong>Nuestra misión:</strong> Hacer que el mundo de las 
+   579→                criptomonedas sea accesible, comprensible y seguro para todos.
+   580→              </p>
+   581→            </article>
+   582→          </section>
+   583→        )}
+   584→
+   585→        {/* Sección: Wallet Educativa */}
+   586→        {activeSection === 'wallet' || activeSection === 'home' ? (
+   587→          <section className="glass-card" id="wallet">
+   588→            <h2>💼 Wallet Open Source Educativa</h2>
+   589→            <p>
+   590→              Esta billetera usa saldos ficticios y simulación de operaciones 
+   591→              para centrarse en el aprendizaje. Conserva una estética seria, 
+   592→              minimalista y profesional, ideal para una presentación técnica.
+   593→            </p>
+   594→
+   595→            <div className="wallet-grid">
+   596→              <div className="wallet-box">
+   597→                <span>🏷️ Dirección</span>
+   598→                <strong>{wallet ? wallet.address : 'Aún no creada'}</strong>
+   599→              </div>
+   600→              <div className="wallet-box">
+   601→                <span>🔑 Clave privada</span>
+   602→                <strong>{wallet ? wallet.privateKey : 'Oculta por seguridad'}</strong>
+   603→              </div>
+   604→              <div className="wallet-box">
+   605→                <span>💰 Saldo ficticio</span>
+   606→                <strong>{wallet ? `${wallet.balance} EDU` : '0.0000 EDU'}</strong>
+   607→              </div>
+   608→            </div>
+   609→
+   610→            <div className="form-grid">
+   611→              <input
+   612→                value={to}
+   613→                onChange={(e) => setTo(e.target.value)}
+   614→                placeholder="Dirección destino ficticia"
+   615→              />
+   616→              <input
+   617→                value={amount}
+   618→                onChange={(e) => setAmount(e.target.value)}
+   619→                placeholder="Monto ficticio"
+   620→                inputMode="decimal"
+   621→              />
+   622→              <button className="primary-btn" onClick={handleTransfer}>
+   623→                Simular transferencia
+   624→              </button>
+   625→            </div>
+   626→
+   627→            {wallet && (
+   628→              <div className="wallet-info">
+   629→                <p>
+   630→                  <strong>📝 Historia de operaciones:</strong>
+   631→                </p>
+   632→                <ul className="transaction-list">
+   633→                  <li>Creación de wallet - {wallet.balance} EDU (saldo inicial)</li>
+   634→                  {status.includes('Operación educativa') && (
+   635→                    <li>{status}</li>
+   636→                  )}
+   637→                </ul>
+   638→              </div>
+   639→            )}
+   640→          </section>
+   641→        ) : null}
+   642→
+   643→        {/* Sección: Manual de Usuario */}
+   644→        {activeSection === 'manual' && (
+   645→          <section className="glass-card" id="manual">
+   646→            <h2>📖 Manual de Usuario</h2>
+   647→            <p>
+   648→              <strong>Instrucciones rápidas:</strong>
+   649→            </p>
+   650→            <ol className="manual-steps">
+   651→              <li>
+   652→                <strong>Crea una wallet educativa</strong> - Haz clic en el botón 
+   653→                "Crear wallet educativa" para generar una wallet con fondos ficticios.
+   654→              </li>
+   655→              <li>
+   656→                <strong>Revisa tu saldo</strong> - Observa tu dirección, clave privada 
+   657→                y saldo en la sección de wallet.
+   658→              </li>
+   659→              <li>
+   660→                <strong>Simula una operación</strong> - Ingresa una dirección de 
+   661→                destino y un monto para simular una transferencia.
+   662→              </li>
+   663→              <li>
+   664→                <strong>Aprende conceptos</strong> - Explora la ruta de aprendizaje 
+   665→                para entender los fundamentos.
+   666→              </li>
+   667→              <li>
+   668→                <strong>Descarga la guía</strong> - Obtén la guía completa en PDF 
+   669→                para aprendizaje offline.
+   670→              </li>
+   671→            </ol>
+   672→            
+   673→            <div className="manual-actions">
+   674→              <button className="primary-btn" onClick={downloadGuide}>
+   675→                📥 Descargar Manual Completo (PDF)
+   676→              </button>
+   677→              <button 
+   678→                className="secondary-btn" 
+   679→                onClick={() => setActiveSection('learning')}
+   680→              >
+   681→                Ver Ruta de Aprendizaje
+   682→              </button>
+   683→            </div>
+   684→
+   685→            {/* FAQ */}
+   686→            <div className="faq-section">
+   687→              <h3>❓ Preguntas Frecuentes</h3>
+   688→              <div className="faq-grid">
+   689→                {faqItems.map((faq, i) => (
+   690→                  <div key={i} className="faq-item">
+   691→                    <h4>{faq.question}</h4>
+   692→                    <p>{faq.answer}</p>
+   693→                  </div>
+   694→                ))}
+   695→              </div>
+   696→            </div>
+   697→          </section>
+   698→        )}
+   699→
+   700→        {/* Sección: Tecnología Usada */}
+   701→        {activeSection === 'tech' && (
+   702→          <section className="glass-card" id="tech">
+   703→            <h2>🛠️ Tecnología Usada</h2>
+   704→            <SupportSection />
+   705→            
+   706→            <div className="tech-details">
+   707→              <article>
+   708→                <h3>Frontend</h3>
+   709→                <ul>
+   710→                  <li><strong>React 18:</strong> Biblioteca para construir interfaces de usuario</li>
+   711→                  <li><strong>Vite:</strong> Herramienta de construcción rápida</li>
+   712→                  <li><strong>CSS3:</strong> Estilos modernos con variables CSS</li>
+   713→                  <li><strong>HTML5:</strong> Estructura semántica</li>
+   714→                </ul>
+   715→              </article>
+   716→
+   717→              <article>
+   718→                <h3>Características Técnicas</h3>
+   719→                <ul>
+   720→                  <li><strong>Responsive Design:</strong> Adapta a móvil, tablet y escritorio</li>
+   721→                  <li><strong>Modo Día/Noche:</strong> Toggle de tema con CSS variables</li>
+   722→                  <li><strong>Componentes Reutilizables:</strong> Arquitectura modular</li>
+   723→                  <li><strong>State Management:</strong> React hooks (useState, useContext)</li>
+   724→                  <li><strong>GitHub Pages:</strong> Despliegue automático</li>
+   725→                </ul>
+   726→              </article>
+   727→
+   728→              <article>
+   729→                <h3>Estructura del Proyecto</h3>
+   730→                <pre className="project-structure">
+   731→{`cryptoeduty_project/
+   732→├── src/
+   733→│   ├── components/
+   734→│   │   ├── ThemeToggle.jsx
+   735→│   │   ├── ProgressBar.jsx
+   736→│   │   └── ...
+   737→│   ├── context/
+   738→│   │   └── content.jsx
+   739→│   ├── data/
+   740→│   │   ├── srcdatacontent.js
+   741→│   │   └── learningPath.js
+   742→│   ├── wallet/
+   743→│   │   └── srcwalletDemo.js
+   744→│   ├── srcApp.jsx
+   745→│   ├── srcmain.jsx
+   746→│   └── srcstyles.css
+   747→├── package.json
+   748→├── vite.config.js
+   749→└── index.html`}
+   750→                </pre>
+   751→              </article>
+   752→            </div>
+   753→          </section>
+   754→        )}
+   755→
+   756→        {/* Sección: Biografía */}
+   757→        {activeSection === 'bio' && (
+   758→          <section className="glass-card" id="bio">
+   759→            <h2>👨‍💻 Biografía del Creador</h2>
+   760→            <p>{creatorBio.summary}</p>
+   761→            <p>{creatorBio.mediumTermGoal}</p>
+   762→            
+   763→            <div className="bio-details">
+   764→              <h3>Motivación</h3>
+   765→              <p>
+   766→                Este proyecto nació de la necesidad de tener una herramienta 
+   767→                educativa accesible que permitiera a las personas aprender sobre 
+   768→                criptomonedas sin el miedo a perder dinero real. Quería crear 
+   769→                algo que yo mismo hubiera deseado tener cuando empecé a aprender 
+   770→                sobre este fascinante mundo.
+   771→              </p>
+   772→            </div>
+   773→          </section>
+   774→        )}
+   775→
+   776→        {/* Sección: Newsletter */}
+   777→        <section className="glass-card newsletter">
+   778→          <h2>📧 Registro de Correo</h2>
+   779→          <p>Recibe novedades del proyecto, actualizaciones y futuras mejoras.</p>
+   780→          <form onSubmit={handleNewsletter} className="newsletter-form">
+   781→            <input
+   782→              type="email"
+   783→              value={email}
+   784→              onChange={(e) => setEmail(e.target.value)}
+   785→              placeholder="juansin0611@gmail.com"
+   786→            />
+   787→            <button className="primary-btn" type="submit">
+   788→              Registrar
+   789→            </button>
+   790→          </form>
+   791→        </section>
+   792→
+   793→        {/* Sección: Novedades Crypto 2026 */}
+   794→        <section className="section-grid">
+   795→          <article className="glass-card">
+   796→            <h2>💡 Tips del mundo cripto</h2>
+   797→            <ul className="styled-list">
+   798→              {cryptoTips.map((tip, i) => (
+   799→                <li key={i}>{tip}</li>
+   800→              ))}
+   801→            </ul>
+   802→          </article>
+   803→
+   804→          <article className="glass-card">
+   805→            <h2>📰 Novedades del mundo crypto 2026</h2>
+   806→            <ul className="styled-list">
+   807→              {cryptoNews2026.map((news, i) => (
+   808→                <li key={i}>{news}</li>
+   809→              ))}
+   810→            </ul>
+   811→          </article>
+   812→        </section>
+   813→
+   814→        {/* Status Banner */}
+   815→        {status && (
+   816→          <div className="status-banner">
+   817→            {status}
+   818→          </div>
+   819→        )}
+   820→
+   821→        {/* Footer */}
+   822→        <footer className="footer">
+   823→          <p>
+   824→            2026 • Licencia MIT • Proyecto open source para aprendizaje 
+   825→            y exploración responsable.
+   826→          </p>
+   827→          <p>
+   828→            Aprender con disciplina hoy construye mejores oportunidades mañana.
+   829→          </p>
+   830→          <div className="footer-links">
+   831→            <a href="https://github.com/JuansinJcy/cryptoeduty_project" target="_blank">
+   832→              GitHub
+   833→            </a>
+   834→            <span>•</span>
+   835→            <a href="#">Política de Privacidad</a>
+   836→            <span>•</span>
+   837→            <a href="#">Términos de Uso</a>
+   838→          </div>
+   839→        </footer>
+   840→      </main>
+   841→    </div>
+   842→  )
+   843→}
+   844→
+   845→// ==================== EXPORTACIÓN PRINCIPAL ====================
+   846→function Root() {
+   847→  return (
+   848→    <ThemeProvider>
+   849→      <App />
+   850→    </ThemeProvider>
+   851→  )
+   852→}
+   853→
+   854→export default Root
