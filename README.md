@@ -1,6 +1,6 @@
 # 🚀 Crypto E-Duty
 
-> **Plataforma educativa open source sobre criptomonedas con billetera ficticia para aprendizaje seguro**
+> **Plataforma educativa open source sobre criptomonedas con billetera para aprendizaje seguro y abierto para jovenes**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![React](https://img.shields.io/badge/React-18.3.1-61DAFB.svg)](https://react.dev/)
@@ -138,7 +138,6 @@ Ser open source significa:
   }
 }
 ```
-
 ---
 
 ## 🚀 Comenzar
@@ -218,16 +217,16 @@ npm run deploy
 4. **¡Listo!** 🎉
 
    Tu sitio estará disponible en:
-   [https://TU_USUARIO.github.io/crypto-e-duty/](https://TU_USUARIO.github.io/crypto-e-duty/)
+   [https://juansinjcy.github.io/cryptoeduty_project/](https://juansinjcy.github.io/cryptoeduty_project/)
 
 ---
 
 ## 📂 Estructura del Proyecto
 
 ```
-crypto-e-duty/
+cryptoeduty_project/
 ├── src/
-│   ├── components/           # Componentes reutilizables
+│   ├── components/           # Componentes utilizables
 │   │   ├── ThemeToggle.jsx
 │   │   ├── ProgressBar.jsx
 │   │   └── LearningModuleCard.jsx
@@ -238,10 +237,10 @@ crypto-e-duty/
 │   │   └── learningPath.js   # Módulos de aprendizaje
 │   ├── wallet/               # Lógica de la wallet
 │   │   └── walletDemo.js     # Wallet educativa
-│   ├── App.jsx               # Componente principal
+│   ├── App.jsx               # Componente principal Donde se visualiza
 │   ├── main.jsx              # Punto de entrada
 │   └── styles.css            # Estilos globales
-├── public/                   # Archivos estáticos
+├── public/                   # Archivos estáticos para carga de imagenes
 │   ├── favicon.svg
 │   ├── apple-touch-icon.png
 │   └── og-image.png
@@ -250,7 +249,6 @@ crypto-e-duty/
 ├── index.html
 └── README.md
 ```
-
 ---
 
 ## 🎨 Características de la Interfaz
@@ -267,7 +265,7 @@ crypto-e-duty/
 - Visualización interactiva
 - Posibilidad de reiniciar el progreso
 
-### 📱 Diseño Responsivo
+### 📱 Diseño movil
 
 | Breakpoint | Descripción |
 |------------|-------------|
@@ -288,7 +286,6 @@ crypto-e-duty/
 - Transiciones suaves entre páginas
 - Efectos hover en botones
 - Animaciones de entrada para elementos
-
 ---
 
 ## 📖 Ruta de Aprendizaje
@@ -378,14 +375,14 @@ Al completar todos los módulos:
 
 ### 🐛 Reportar Errores
 
-1. Abre un [Issue](https://github.com/TU_USUARIO/crypto-e-duty/issues)
+1. Abre un [Issue](https://github.com/juansinjcy/crypto-e-duty/issues)
 2. Describe el problema con detalle
 3. Incluye pasos para reproducirlo
 4. Añade capturas de pantalla si es necesario
 
 ### 💡 Sugerir Mejoras
 
-1. Abre un [Issue](https://github.com/TU_USUARIO/crypto-e-duty/issues) con la etiqueta `enhancement`
+1. Abre un [Issue](https://github.com/crypto-e-duty/issues) con la etiqueta `enhancement`
 2. Describe tu idea
 3. Explica el beneficio
 4. Incluye ejemplos si es posible
@@ -445,13 +442,12 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
-
 ---
 
 ## 🙏 Agradecimientos
 
 - 🙏 **A la comunidad open source** por su apoyo y herramientas
-- 🎓 **A los educadores** que inspiraron este proyecto
+- 🎓 **A los educadores** que me inspiraron para este proyecto
 - 💡 **A los desarrolladores** de React, Vite y otras tecnologías usadas
 - 🌟 **A todos los contribuyentes** que hacen este proyecto mejor
 
@@ -459,9 +455,9 @@ SOFTWARE.
 
 ## 📞 Contacto
 
-- **GitHub**: [@TU_USUARIO](https://github.com/TU_USUARIO)
-- **Proyecto**: [crypto-e-duty](https://github.com/TU_USUARIO/crypto-e-duty)
-- **Sitio web**: [https://TU_USUARIO.github.io/crypto-e-duty/](https://TU_USUARIO.github.io/crypto-e-duty/)
+- **GitHub**: [@juansinjcy](https://github.com/juansinjcy)
+- **Proyecto**: [crypto-e-duty](https://github.com/juansinjcy/crypto-e-duty)
+- **Sitio web**: [https://juansinjcy.github.io/crypto-e-duty/](https://juansinjcy.github.io/cryptoeduty_project/)
 
 ---
 
@@ -477,8 +473,8 @@ SOFTWARE.
 
 <div align="center">
 
-**Hecho con ❤️ y JavaScript**
+**Hecho con React, ❤️ y JavaScript**
 
-*"Aprender con disciplina hoy construye mejores oportunidades mañana."*
+*"Aprender con disciplina hoy construye mejores oportunidades mañana, el mañana espera Atm: Juan Carlos Yepez Kepp."*
 
 </div>
