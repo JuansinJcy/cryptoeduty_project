@@ -6,7 +6,7 @@
   "private": true,
   "version": "2.0.0",
   "description": "Plataforma educativa open source sobre criptomonedas con billetera ficticia",
-  "homepage": "https://github.com/JuansinJcy/cryptoeduty_project",
+  "homepage": "https://github.com/juansinJcy/cryptoeduty_project",
   "type": "module",
   "scripts": {
     "dev": "vite",
